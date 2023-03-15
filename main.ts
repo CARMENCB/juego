@@ -24,7 +24,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         Salto = false
         Heroe.setVelocity(0, -125)
         pause(200)
-        Heroe.setVelocity(0, -50)
+        Heroe.setVelocity(0, -75)
         pause(100)
         Heroe.setVelocity(0, 100)
     }
@@ -179,7 +179,7 @@ Heroe.changeScale(0.3, ScaleAnchor.Middle)
 Heroe.setPosition(80, 109)
 scene.cameraFollowSprite(Heroe)
 Salto = true
-game.onUpdateInterval(1000, function () {
+game.onUpdateInterval(2000, function () {
     Salto = true
 })
 forever(function () {
