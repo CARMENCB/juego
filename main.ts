@@ -24,13 +24,16 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         Salto = false
         Heroe.setVelocity(0, -125)
         pause(200)
+        Movimiento = false
         Heroe.setVelocity(0, -75)
         pause(100)
         Heroe.setVelocity(0, 100)
+        Movimiento = true
     }
 })
 let distancia = 0
 let projectile: Sprite = null
+let Movimiento = false
 let Salto = false
 let Heroe: Sprite = null
 let Empezar = false
@@ -180,26 +183,29 @@ Heroe.changeScale(0.3, ScaleAnchor.Middle)
 Heroe.setPosition(80, 109)
 scene.cameraFollowSprite(Heroe)
 Salto = true
+Movimiento = false
 game.onUpdateInterval(1000, function () {
     Salto = true
 })
 forever(function () {
     if (Empezar == true) {
         pause(1000)
-        controller.moveSprite(Heroe, 100, 0)
-        Heroe.setVelocity(0, 150)
+        if (Movimiento == true) {
+            controller.moveSprite(Heroe, 100, 0)
+            Heroe.setVelocity(0, 150)
+        }
     }
 })
 forever(function () {
-    while (Empezar == true && controller.right.isPressed()) {
-        distancia = 1
+    while (Empezar == true && controller.left.isPressed() && Movimiento == true) {
+        distancia = -1
         pause(100)
         info.changeScoreBy(distancia)
     }
 })
 forever(function () {
-    while (Empezar == true && controller.left.isPressed()) {
-        distancia = -1
+    while (Empezar == true && controller.right.isPressed() && Movimiento == true) {
+        distancia = 1
         pause(100)
         info.changeScoreBy(distancia)
     }
