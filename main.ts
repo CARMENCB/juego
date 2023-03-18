@@ -1,5 +1,16 @@
+namespace SpriteKind {
+    export const Disparito = SpriteKind.create()
+    export const Aviso = SpriteKind.create()
+    export const Mejora = SpriteKind.create()
+    export const Vida = SpriteKind.create()
+    export const Fin = SpriteKind.create()
+    export const Enemy2 = SpriteKind.create()
+    export const Enemy3 = SpriteKind.create()
+    export const Dinero = SpriteKind.create()
+}
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    projectile = sprites.createProjectileFromSprite(img`
+    Inmúnidad = true
+    Disparo = sprites.create(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -16,7 +27,14 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `, Heroe, 150, 0)
+        `, SpriteKind.Disparito)
+    Disparo.setPosition(Heroe.x, Heroe.y)
+    Disparo.setVelocity(150, 0)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy3, function (sprite, otherSprite) {
+    info.setLife(0)
+    sprites.destroy(sprite)
+    sprites.destroy(otherSprite)
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (Salto == true) {
@@ -31,8 +49,68 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         Movimiento = true
     }
 })
-let distancia = 0
-let projectile: Sprite = null
+sprites.onOverlap(SpriteKind.Disparito, SpriteKind.Enemy2, function (sprite, otherSprite) {
+    Villano2 = false
+    sprites.destroy(otherSprite)
+    sprites.destroy(sprite)
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    sprites.destroy(sprite)
+})
+sprites.onOverlap(SpriteKind.Disparito, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprites.destroy(sprite)
+    sprites.destroy(otherSprite)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Dinero, function (sprite, otherSprite) {
+    info.changeScoreBy(1)
+    sprites.destroy(otherSprite)
+})
+sprites.onOverlap(SpriteKind.Disparito, SpriteKind.Enemy, function (sprite, otherSprite) {
+    Villano_1 = false
+    sprites.destroy(otherSprite)
+    sprites.destroy(sprite)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Fin, function (sprite, otherSprite) {
+    game.gameOver(true)
+    game.setGameOverEffect(true, effects.confetti)
+})
+info.onLifeZero(function () {
+    game.gameOver(false)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy2, function (sprite, otherSprite) {
+    info.setLife(0)
+    sprites.destroy(sprite)
+    sprites.destroy(otherSprite)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Vida, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite)
+    info.changeLifeBy(1)
+})
+sprites.onOverlap(SpriteKind.Disparito, SpriteKind.Enemy3, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite)
+    sprites.destroy(sprite)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    info.setLife(0)
+    sprites.destroy(sprite)
+    sprites.destroy(otherSprite)
+})
+let Veneno: Sprite = null
+let Fantasma: Sprite = null
+let Murciélago: Sprite = null
+let Alerta_murciélago: Sprite = null
+let Serpiente: Sprite = null
+let Alerta_pato: Sprite = null
+let Pato: Sprite = null
+let Corazón_sprite: Sprite = null
+let Moneda: Sprite = null
+let Banderín: Sprite = null
+let Marco: Sprite = null
+let Villano_1 = false
+let Villano2 = false
+let Disparo: Sprite = null
+let Inmúnidad = false
 let Movimiento = false
 let Salto = false
 let Heroe: Sprite = null
@@ -162,30 +240,83 @@ scene.setBackgroundImage(img`
     `)
 tiles.setCurrentTilemap(tilemap`level1`)
 Heroe = sprites.create(img`
-    . . . . . . . f f f f f . . . . 
+    . . . . . . . . . . . . . . . . 
     . . . . . . f 1 1 1 1 1 f . . . 
     . . . . . f 1 1 1 d d d d f . . 
     . . . . f f 1 1 d f d d f d c . 
     . . . f d d 1 1 d f d d f d c . 
-    . . . c d b 1 1 d d d d e e d c 
-    f f . c d b 1 1 d d c d d d d c 
-    f 1 f . c f 1 1 d d d c c c c c 
-    f 1 f . . f f 1 1 d d d d d f . 
-    f 1 f . f 1 1 1 1 f f f f f . . 
-    f 1 f f 1 1 1 1 1 1 1 f . . . . 
+    . . . c d b 1 1 d d d d e e d . 
+    . f . c d b 1 1 d d c d d d d . 
+    . 1 f . c f 1 1 d d d c c c c . 
+    . 1 f . . f f 1 1 d d d d d f . 
+    . 1 f . f 1 1 1 1 f f f f f . . 
+    . 1 f f 1 1 1 1 1 1 1 f . . . . 
     . f f 1 1 1 1 f 1 f f 1 f . . . 
     . . f 1 1 1 1 f 1 f f 1 f . . . 
     . . . f 1 f f b d f b d f . . . 
     . . . f d b b d d c d d f . . . 
-    . . . f f f f f f f f f . . . . 
+    . . . . . . . . . . . . . . . . 
     `, SpriteKind.Player)
-Heroe.changeScale(0.3, ScaleAnchor.Middle)
-Heroe.setPosition(80, 109)
+Heroe.changeScale(0.15, ScaleAnchor.Middle)
+Heroe.setPosition(80, 105)
 scene.cameraFollowSprite(Heroe)
 Salto = true
 Movimiento = false
+let X = 80
+info.setLife(5)
+Inmúnidad = false
+let Posición_monedas = 100
+let Posición_Fin = true
+let Corazón = 500
+let Y = 150
+let Z = 300
 game.onUpdateInterval(1000, function () {
     Salto = true
+})
+forever(function () {
+    if (3750 <= Heroe.x && true == Posición_Fin) {
+        Posición_Fin = false
+        Marco = sprites.create(img`
+            . . . . f f f f . . . . . 
+            . . f f f f f f f f . . . 
+            . f f f f f f c f f f . . 
+            f f f f f f c c f f f c . 
+            f f f c f f f f f f f c . 
+            c c c f f f e e f f c c . 
+            f f f f f e e f f c c f . 
+            f f f b f e e f b f f f . 
+            . f 4 1 f 4 4 f 1 4 f . . 
+            . f e 4 4 4 4 4 4 e f . . 
+            . f f f e e e e f f f . . 
+            f e f b 7 7 7 7 b f e f . 
+            e 4 f 7 7 7 7 7 7 f 4 e . 
+            e e f 6 6 6 6 6 6 f e e . 
+            . . . f f f f f f . . . . 
+            . . . f f . . f f . . . . 
+            `, SpriteKind.Fin)
+        Banderín = sprites.create(img`
+            . . . . . . 1 1 . . . . . . . . 
+            . . . . . . f f 2 2 . . . . . . 
+            . . . . . . f f 2 2 2 2 . . . . 
+            . . . . . . f f 2 2 2 2 2 2 . . 
+            . . . . . . f f 2 2 2 2 2 2 2 2 
+            . . . . . . f f 2 2 2 2 2 2 2 2 
+            . . . . . . f f 2 2 2 2 2 2 . . 
+            . . . . . . f f 2 2 2 2 . . . . 
+            . . . . . . f f 2 2 . . . . . . 
+            . . . . . . f f . . . . . . . . 
+            . . . . . . f f . . . . . . . . 
+            . . . . . . f f . . . . . . . . 
+            . . . . . . f f . . . . . . . . 
+            . . . . . . f f . . . . . . . . 
+            . . . . . . f f . . . . . . . . 
+            . . . . . f f f f . . . . . . . 
+            `, SpriteKind.Fin)
+        Marco.setPosition(Heroe.x + 250, 0)
+        Banderín.setPosition(Heroe.x + 245, 0)
+        Marco.setVelocity(0, 3000)
+        Banderín.setVelocity(0, 3000)
+    }
 })
 forever(function () {
     if (Empezar == true) {
@@ -197,16 +328,240 @@ forever(function () {
     }
 })
 forever(function () {
-    while (Empezar == true && controller.left.isPressed() && Movimiento == true) {
-        distancia = -1
+    if (Empezar == true) {
+        Moneda = sprites.create(img`
+            . . b b b b . . 
+            . b 5 5 5 5 b . 
+            b 5 d 3 3 d 5 b 
+            b 5 3 5 5 1 5 b 
+            c 5 3 5 5 1 d c 
+            c d d 1 1 d d c 
+            . f d d d d f . 
+            . . f f f f . . 
+            `, SpriteKind.Dinero)
+        Moneda.setVelocity(0, 3000)
+        Posición_monedas = 40 + Posición_monedas
+        Moneda.setPosition(Posición_monedas, 0)
         pause(100)
-        info.changeScoreBy(distancia)
     }
 })
 forever(function () {
-    while (Empezar == true && controller.right.isPressed() && Movimiento == true) {
-        distancia = 1
-        pause(100)
-        info.changeScoreBy(distancia)
+    if (Corazón <= Heroe.x) {
+        Villano_1 = true
+        Corazón_sprite = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . f f f f f f . f f f f f f . 
+            . f f 3 3 3 3 f f f 3 3 3 3 f f 
+            . f 3 3 3 3 3 3 f 3 3 3 3 3 3 f 
+            . f 3 3 3 3 3 3 3 3 1 1 1 3 3 f 
+            . f 3 3 3 3 3 3 3 3 1 1 1 3 3 f 
+            . f 3 3 3 3 3 b b b 1 1 1 3 3 f 
+            . f 3 3 3 3 b b b b b 3 3 3 3 f 
+            . f f 3 3 b b b b b b b 3 3 f f 
+            . . f f 3 b b b b b b b 3 f f . 
+            . . . f f b b b b b b b f f . . 
+            . . . . f f b b b b b f f . . . 
+            . . . . . f f b b b f f . . . . 
+            . . . . . . f f b f f . . . . . 
+            . . . . . . . f f f . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Vida)
+        Corazón_sprite.setPosition(Heroe.x + Math.round(100), Math.round(100))
+        Corazón += 1500
+    }
+})
+forever(function () {
+    if (130 <= Heroe.y) {
+        game.gameOver(false)
+    }
+})
+forever(function () {
+    if (Z <= Heroe.x && Empezar == true && Posición_Fin == true) {
+        Villano2 = true
+        Pato = sprites.create(img`
+            . . . . b 5 b . . . . . . . . . 
+            . . . . b 5 b . . . . . . . . . 
+            . . . . b b b b b b . . . . . . 
+            . . . b 5 5 5 5 5 b b . . . . . 
+            . . c 4 d 5 5 c b 5 b b . . . . 
+            b 4 4 4 d d f b 5 5 5 b b b b . 
+            . b 4 4 4 4 b c b 5 5 b 5 d b . 
+            . . b 4 4 4 4 5 5 5 b 5 5 b . . 
+            . . b 5 5 5 5 5 5 b 5 5 d b . . 
+            . b 5 5 5 5 5 5 d 5 5 5 b d b . 
+            . b 5 5 5 5 5 5 b 5 5 d c d d b 
+            . b 5 5 5 5 5 5 5 b c c d d d c 
+            . b 5 5 5 5 5 5 5 d d d d d b c 
+            . b d 5 5 5 5 5 d d d d d d c . 
+            . . b b 5 5 5 d d d d d b c . . 
+            . . . b b c c c c c c c c . . . 
+            `, SpriteKind.Enemy2)
+        Pato.setPosition(Heroe.x + 160, 80)
+        Pato.follow(Heroe, 50)
+        Z += 1000
+        Alerta_pato = sprites.create(img`
+            . . . . . . . 5 5 . . . . . . . 
+            . . . . . . . 5 5 . . . . . . . 
+            . . . . . . 5 5 5 5 . . . . . . 
+            . . . . . . 5 5 5 5 . . . . . . 
+            . . . . . 5 5 1 1 5 5 . . . . . 
+            . . . . . 5 5 1 1 5 5 . . . . . 
+            . . . . 5 5 1 f f 1 5 5 . . . . 
+            . . . 5 5 1 1 f f 1 1 5 5 . . . 
+            . . . 5 5 1 1 f f 1 1 5 5 . . . 
+            . . 5 5 1 1 1 f f 1 1 1 5 5 . . 
+            . . 5 5 1 1 1 1 1 1 1 1 5 5 . . 
+            . 5 5 1 1 1 1 f f 1 1 1 1 5 5 . 
+            . 5 5 1 1 1 1 f f 1 1 1 1 5 5 . 
+            5 5 1 1 1 1 1 1 1 1 1 1 1 1 5 5 
+            5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+            5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+            `, SpriteKind.Aviso)
+        Alerta_pato.setPosition(Heroe.x + 80, 60)
+    }
+})
+forever(function () {
+    if (X <= Heroe.x && Empezar == true && Posición_Fin == true) {
+        Villano_1 = true
+        Serpiente = sprites.create(img`
+            . . . . . c c c c c c c . . . . 
+            . . . . c 6 7 7 7 7 7 6 c . . . 
+            . . . c 7 c 6 6 6 6 c 7 6 c . . 
+            . . c 6 7 6 f 6 6 f 6 7 7 c . . 
+            . . c 7 7 7 7 7 7 7 7 7 7 c . . 
+            . . f 7 8 1 f f 1 6 7 7 7 f . . 
+            . . f 6 f 1 f f 1 f 7 7 7 f . . 
+            . . . f f 2 2 2 2 f 7 7 6 f . . 
+            . . c c f 2 2 2 2 7 7 6 f c . . 
+            . c 7 7 7 7 7 7 7 7 c c 7 7 c . 
+            c 7 1 1 1 7 7 7 7 f c 6 7 7 7 c 
+            f 1 1 1 1 1 7 6 f c c 6 6 6 c c 
+            f 1 1 1 1 1 1 6 6 c 6 6 6 c . . 
+            f 6 1 1 1 1 1 6 6 6 6 6 6 c . . 
+            . f 6 1 1 1 1 1 6 6 6 6 c . . . 
+            . . f f c c c c c c c c . . . . 
+            `, SpriteKind.Enemy)
+        Serpiente.setPosition(Heroe.x + 160, 0)
+        Serpiente.setVelocity(0, 3000)
+        X += 500
+        Alerta_murciélago = sprites.create(img`
+            . . . . . . . 7 7 . . . . . . . 
+            . . . . . . . 7 7 . . . . . . . 
+            . . . . . . 7 7 7 7 . . . . . . 
+            . . . . . . 7 7 7 7 . . . . . . 
+            . . . . . 7 7 1 1 7 7 . . . . . 
+            . . . . . 7 7 1 1 7 7 . . . . . 
+            . . . . 7 7 1 f f 1 7 7 . . . . 
+            . . . 7 7 1 1 f f 1 1 7 7 . . . 
+            . . . 7 7 1 1 f f 1 1 7 7 . . . 
+            . . 7 7 1 1 1 f f 1 1 1 7 7 . . 
+            . . 7 7 1 1 1 1 1 1 1 1 7 7 . . 
+            . 7 7 1 1 1 1 f f 1 1 1 1 7 7 . 
+            . 7 7 1 1 1 1 f f 1 1 1 1 7 7 . 
+            7 7 1 1 1 1 1 1 1 1 1 1 1 1 7 7 
+            7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 
+            7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 
+            `, SpriteKind.Aviso)
+        Alerta_murciélago.setPosition(Heroe.x + 80, 60)
+    }
+})
+forever(function () {
+    if (Y <= Heroe.x && Empezar == true && Posición_Fin == true) {
+        Murciélago = sprites.create(img`
+            . . f f f . . . . . . . . f f f 
+            . f f c c . . . . . . f c b b c 
+            f f c c . . . . . . f c b b c . 
+            f c f c . . . . . . f b c c c . 
+            f f f c c . c c . f c b b c c . 
+            f f c 3 c c 3 c c f b c b b c . 
+            f f b 3 b c 3 b c f b c c b c . 
+            . c b b b b b b c b b c c c . . 
+            . c 1 b b b 1 b b c c c c . . . 
+            c b b b b b b b b b c c . . . . 
+            c b c b b b c b b b b f . . . . 
+            f b 1 f f f 1 b b b b f c . . . 
+            f b b b b b b b b b b f c c . . 
+            . f b b b b b b b b c f . . . . 
+            . . f b b b b b b c f . . . . . 
+            . . . f f f f f f f . . . . . . 
+            `, SpriteKind.Enemy3)
+        Murciélago.setPosition(Heroe.x + 160, 70)
+        Murciélago.setVelocity(-75, 0)
+        Y += 150
+        Alerta_murciélago = sprites.create(img`
+            . . . . . . . c c . . . . . . . 
+            . . . . . . . c c . . . . . . . 
+            . . . . . . c c c c . . . . . . 
+            . . . . . . c c c c . . . . . . 
+            . . . . . c c 1 1 c c . . . . . 
+            . . . . . c c 1 1 c c . . . . . 
+            . . . . c c 1 f f 1 c c . . . . 
+            . . . c c 1 1 f f 1 1 c c . . . 
+            . . . c c 1 1 f f 1 1 c c . . . 
+            . . c c 1 1 1 f f 1 1 1 c c . . 
+            . . c c 1 1 1 1 1 1 1 1 c c . . 
+            . c c 1 1 1 1 f f 1 1 1 1 c c . 
+            . c c 1 1 1 1 f f 1 1 1 1 c c . 
+            c c 1 1 1 1 1 1 1 1 1 1 1 1 c c 
+            c c c c c c c c c c c c c c c c 
+            c c c c c c c c c c c c c c c c 
+            `, SpriteKind.Aviso)
+        Alerta_murciélago.setPosition(Heroe.x + 80, 60)
+    }
+})
+forever(function () {
+    if (Villano2 == true) {
+        Fantasma = sprites.createProjectileFromSprite(img`
+            ........................
+            ........................
+            ........................
+            ........................
+            ..........ffff..........
+            ........ff1111ff........
+            .......fb111111bf.......
+            .......f1111111df.......
+            ......fd1111111ddf......
+            ......fd111111dddf......
+            ......fd111ddddddf......
+            ......fd1dfbddddbf......
+            ......fbddfcdbbbcf......
+            .......f11111bbcf.......
+            .......f1b1fffff........
+            .......fbfc111bf........
+            ........ff1b1bff........
+            .........fbfbfff.f......
+            ..........ffffffff......
+            ............fffff.......
+            ........................
+            ........................
+            ........................
+            ........................
+            `, Pato, 0, 0)
+        Fantasma.setPosition(Pato.x, Pato.y - 10)
+        Fantasma.changeScale(0.25, ScaleAnchor.Middle)
+        pause(500)
+    }
+})
+forever(function () {
+    if (Villano_1 == true) {
+        Veneno = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . 5 1 1 . . . . . . . 
+            . . . . . 5 5 . 5 1 . . . . . . 
+            . . 5 7 7 5 . . . 1 . . . . . . 
+            . 5 5 1 7 7 . . . 5 1 . . . . . 
+            . 5 1 1 1 5 7 7 . 5 1 . . . . . 
+            . 5 1 1 1 5 5 5 5 5 1 7 7 7 . . 
+            . 5 1 1 1 1 1 1 1 5 1 1 1 1 . . 
+            . 5 1 1 1 5 5 5 5 5 1 7 7 7 . . 
+            . 5 1 1 1 5 7 7 . 5 1 . . . . . 
+            . 5 5 1 7 7 . . . 5 1 . . . . . 
+            . . 5 7 7 5 . . . 1 . . . . . . 
+            . . . . . 5 5 . 5 1 . . . . . . 
+            . . . . . . 5 1 1 . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, Serpiente, -100, 0)
+        pause(1000)
     }
 })
