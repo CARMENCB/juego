@@ -274,6 +274,21 @@ game.onUpdateInterval(1000, function () {
     Salto = true
 })
 forever(function () {
+    if (Empezar == false) {
+        Heroe.sayText("Hola,soy Amelio de la serie de Marco.Y he perdido a Marco. Lo echo mucho de menos.")
+        pause(5000)
+        Heroe.sayText(" ¿Me ayudas a buscarlo? Para comenzar la partida hay que saltar")
+        pause(5000)
+        Heroe.sayText("Para saltar pulse A para disparar pulse B para moverse mueva la cruz")
+        pause(5000)
+    }
+})
+forever(function () {
+    if (Empezar == true) {
+        Heroe.sayText("")
+    }
+})
+forever(function () {
     if (3750 <= Heroe.x && true == Posición_Fin) {
         Posición_Fin = false
         Marco = sprites.create(img`
